@@ -1,3 +1,13 @@
+# このソースツリーについて
+
+[三木 康暉様](http://giginet.hateblo.jp/)の作品の下記のリポジトリからforkしています。
+
+https://github.com/giginet/KawazJet
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">クリエイティブ・コモンズ 表示 - 非営利 - 継承 4.0 国際 ライセンス</a>に基づき再利用させていただいています。
+
+変更分の権利は主張できるかもしれませんが、放棄いたします。
+
 # かわずたんジェット！
 
 このゲームは『cocos2d-xではじめるスマートフォンゲーム開発 [cocos2d-x Ver.3対応] for iOS/Android 』のサンプルゲーム2本目です。
