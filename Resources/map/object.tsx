@@ -28,4 +28,9 @@
    <property name="category" value="4"/>
   </properties>
  </tile>
+ <tile id="5">
+  <properties>
+   <property name="category" value="32"/>
+  </properties>
+ </tile>
 </tileset>
