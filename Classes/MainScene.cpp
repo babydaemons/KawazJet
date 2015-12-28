@@ -18,7 +18,7 @@ const Vec2 GRAVITY_ACCELERATION = Vec2(0, -10);
 const Vec2 IMPULSE_ACCELERATION = Vec2(0, 500);
 const int MAX_ITEM_COUNT = 3;
 const int MAX_HEART_COUNT = 10;
-const int INIT_HEART_COUNT = 5;
+const int INIT_HEART_COUNT = 3;
 const float INIT_MATCHLESS_SECOND = 3;
 
 int MainScene::_heartCountOnGame = INIT_HEART_COUNT;
@@ -270,7 +270,7 @@ void MainScene::update(float dt)
 
     // クリア判定
     if (_stage->getPlayer()->getPosition().x >= _stage->getTiledMap()->getContentSize().width * _stage->getTiledMap()->getScale()) {
-        if (_state == State::MAIN) {
+        if (_state == State::MAIN || _state == State::MATCHLESS) {
             this->onClear();
         }
     }
@@ -280,6 +280,15 @@ void MainScene::update(float dt)
     auto position = _stage->getPlayer()->getPosition();
     const auto margin = _stage->getPlayer()->getContentSize().height / 2.0;
     if (position.y < -margin || position.y >= winSize.height + margin) {
+        // プレイヤーを強制的に画面内に戻す
+        if (position.y < -margin) {
+            position.y = margin;
+        } else if (position.y >= winSize.height + margin) {
+            position.y = winSize.height - margin;
+        }
+        _stage->getPlayer()->setPosition(position);
+
+        // ハート減の処理
         this->onDead();
     }
     
