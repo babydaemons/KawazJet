@@ -27,7 +27,9 @@ public:
         /// コイン
         COIN = 1 << 3,
         /// 収集アイテム
-        ITEN = 1 << 4
+        ITEN = 1 << 4,
+        /// ハート
+        HEART = 1 << 5,
     };
     
     void update(float dt) override;

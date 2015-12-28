@@ -17,6 +17,11 @@ const int STAGE_COUNT = 5;
 const Vec2 GRAVITY_ACCELERATION = Vec2(0, -10);
 const Vec2 IMPULSE_ACCELERATION = Vec2(0, 500);
 const int MAX_ITEM_COUNT = 3;
+const int MAX_HEART_COUNT = 10;
+const int INIT_HEART_COUNT = 5;
+const float INIT_MATCHLESS_SECOND = 3;
+
+int MainScene::_heartCountOnGame = INIT_HEART_COUNT;
 
 Scene* MainScene::createSceneWithStage(int level)
 {
@@ -88,8 +93,8 @@ bool MainScene::initWithLevel(int level)
         auto layer = dynamic_cast<TMXLayer *>(body->getNode()->getParent());
         
         if (category & static_cast<int>(Stage::TileType::ENEMY)) {
-            // ゲームオーバー
-            this->onGameOver();
+            // ハート減で残なしならゲームオーバー
+            this->onDead();
         } else if (category & (int)Stage::TileType::COIN) {
             // コイン
             layer->removeChild(body->getNode(), true);
@@ -104,8 +109,17 @@ bool MainScene::initWithLevel(int level)
             } else {
                 CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(AudioUtils::getFileName("food").c_str());
             }
+        } else if (category & static_cast<int>(Stage::TileType::HEART)) {
+            // ハート
+            layer->removeChild(body->getNode(), true);
+            this->onGetHeart(body->getNode());
+            if (_heartCount == MAX_HEART_COUNT) {
+                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(AudioUtils::getFileName("heart2").c_str());
+            } else {
+                CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(AudioUtils::getFileName("heart1").c_str());
+            }
         }
-        
+    
         return true;
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
@@ -180,6 +194,18 @@ bool MainScene::initWithLevel(int level)
         sprite->setColor(Color3B::BLACK);
     }
     
+    // 取得したハートの数を表示
+    if (level == 0) {
+        _heartCount = _heartCountOnGame = INIT_HEART_COUNT;
+    }
+    for (int i = 0; i < MAX_HEART_COUNT; ++i) {
+        auto sprite = Sprite::create("heart.png");
+        sprite->setPosition(Vec2(winSize.width - 15, 20 + i * 20));
+        this->addChild(sprite);
+        _hearts.pushBack(sprite);
+        sprite->setColor((i < _heartCount) ? Color3B::WHITE : Color3B::BLACK);
+    }
+    
     return true;
 }
 
@@ -187,7 +213,9 @@ MainScene::MainScene()
 : _isPress(false)
 , _coin(0)
 , _itemCount(0)
+, _heartCount(0)
 , _second(0)
+, _matchlessSecond(0)
 , _state(State::MAIN)
 , _stage(nullptr)
 , _parallaxNode(nullptr)
@@ -195,6 +223,7 @@ MainScene::MainScene()
 , _stageLabel(nullptr)
 , _secondLabel(nullptr)
 {
+    _heartCount = _heartCountOnGame;
 }
 
 MainScene::~MainScene()
@@ -229,6 +258,16 @@ void MainScene::update(float dt)
     // 背景をプレイヤーの位置によって動かす
     _parallaxNode->setPosition(_stage->getPlayer()->getPosition() * -1);
     
+    // 無敵状態のとき、無敵時間が無くなったら通常状態へ遷移
+    if (_state == State::MATCHLESS) {
+        _matchlessSecond -= dt;
+        if (_matchlessSecond <= 0) {
+            this->setState(State::MAIN);
+            // 無敵状態から通常状態への遷移の効果音を鳴らす
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(AudioUtils::getFileName("resume").c_str());
+        }
+    }
+
     // クリア判定
     if (_stage->getPlayer()->getPosition().x >= _stage->getTiledMap()->getContentSize().width * _stage->getTiledMap()->getScale()) {
         if (_state == State::MAIN) {
@@ -236,14 +275,12 @@ void MainScene::update(float dt)
         }
     }
     
-    // 画面外からはみ出したとき、ゲームオーバー判定
+    // 画面外からはみ出したとき、ハート減：ゼロならゲームオーバー判定
     auto winSize = Director::getInstance()->getWinSize();
     auto position = _stage->getPlayer()->getPosition();
     const auto margin = _stage->getPlayer()->getContentSize().height / 2.0;
     if (position.y < -margin || position.y >= winSize.height + margin) {
-        if (this->getState() == State::MAIN) {
-            this->onGameOver();
-        }
+        this->onDead();
     }
     
     // コインの枚数の更新
@@ -255,14 +292,55 @@ void MainScene::update(float dt)
         _stage->getPlayer()->getPhysicsBody()->applyImpulse(IMPULSE_ACCELERATION);
     }
     
-    if (_state == State::MAIN) {
+    if (_state == State::MAIN || _state == State::MATCHLESS) {
         _second += dt;
         this->updateSecond();
     }
 }
 
+void MainScene::onDead()
+{
+    // 通常状態のみ
+    if (_state == State::MAIN) {
+        // ハートを減らす
+        --_heartCount;
+
+        // ハート取得数の表示更新
+        for (int i = 0; i < MAX_HEART_COUNT; ++i) {
+            _hearts.at(i)->setColor((i < _heartCount) ? Color3B::WHITE : Color3B::BLACK);
+        }
+        
+        // ハートが残ってる時のみ、ライフ減の効果音を鳴らす
+        if (_heartCount > 0) {
+            CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(AudioUtils::getFileName("powerdown").c_str());
+        }
+        
+        // パーティクル表示
+        auto explosition = ParticleExplosion::create();
+        explosition->setPosition(_stage->getPlayer()->getPosition());
+        _stage->addChild(explosition);
+    }
+
+    // 無敵状態に遷移
+    this->setState(State::MATCHLESS);
+
+    // ハートが残ってないならゲームオーバー
+    if (_heartCount <= 0) {
+        this->onGameOver();
+        return;
+    }
+    
+    // 無敵状態の残時間を初期化
+    _matchlessSecond = INIT_MATCHLESS_SECOND;
+}
+
 void MainScene::onGameOver()
 {
+    CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
+
+    // ハートの数を初期値に戻す
+    _heartCountOnGame = _heartCount = INIT_HEART_COUNT;
+    
     this->setState(State::GAMEOVER);
     _stage->getPlayer()->removeFromParent();
     
@@ -289,15 +367,8 @@ void MainScene::onGameOver()
     menu->alignItemsVerticallyWithPadding(20);
     this->addChild(menu);
     menu->setPosition(winSize.width / 2.0, winSize.height / 3);
-    
-    // パーティクル表示
-    auto explosition = ParticleExplosion::create();
-    explosition->setPosition(_stage->getPlayer()->getPosition());
-    _stage->addChild(explosition);
-    
-    
-    CocosDenshion::SimpleAudioEngine::getInstance()->stopBackgroundMusic();
-    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(AudioUtils::getFileName("explode").c_str());
+
+    CocosDenshion::SimpleAudioEngine::getInstance()->playBackgroundMusic(AudioUtils::getFileName("explode").c_str());
 }
 
 void MainScene::onClear()
@@ -340,6 +411,18 @@ void MainScene::onGetItem(cocos2d::Node * item)
     for (int i = 0; i < _itemCount; ++i) {
         _items.at(i)->setColor(Color3B::WHITE);
     }
+}
+
+void MainScene::onGetHeart(cocos2d::Node * heart)
+{
+    _heartCount += 1;
+    if (_heartCount > MAX_HEART_COUNT) {
+        _heartCount = MAX_HEART_COUNT;
+    }
+    for (int i = 0; i < _heartCount; ++i) {
+        _hearts.at(i)->setColor(Color3B::WHITE);
+    }
+    _heartCountOnGame = _heartCount;
 }
 
 void MainScene::updateSecond()

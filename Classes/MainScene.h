@@ -21,7 +21,8 @@ public:
         READY,
         MAIN,
         CLEAR,
-        GAMEOVER
+        GAMEOVER,
+        MATCHLESS
     };
     
     /** 任意の番号のステージでシーンを作成します
@@ -41,12 +42,18 @@ public:
     CC_SYNTHESIZE(int, _coin, Coin);
     /// 現在のアイテム取得数
     CC_SYNTHESIZE(int, _itemCount, ItemCount);
+    /// 現在のハート取得数
+    CC_SYNTHESIZE(int, _heartCount, HeartCount);
     /// 現在のゲーム状態
     CC_SYNTHESIZE(State, _state, State);
     /// 現在の経過時間（秒）
     CC_SYNTHESIZE(float, _second, Second);
+    /// 無敵の残時間（秒）
+    CC_SYNTHESIZE(float, _matchlessSecond, MatchlessSecond);
     /// アイテム表示用のスプライト一覧
     CC_SYNTHESIZE_PASS_BY_REF(cocos2d::Vector<cocos2d::Sprite *>, _items, Items);
+    /// ハート表示用のスプライト一覧
+    CC_SYNTHESIZE_PASS_BY_REF(cocos2d::Vector<cocos2d::Sprite *>, _hearts, Hearts);
     /// ステージ
     CC_SYNTHESIZE_RETAIN(Stage *, _stage, Stage);
     /// コイン枚数表示用のラベル
@@ -66,9 +73,15 @@ protected:
     bool initWithLevel(int level);
     
 private:
+    void onDead();
     void onGameOver();
     void onClear();
     void onGetItem(cocos2d::Node * item);
+    void onGetHeart(cocos2d::Node * heart);
+    
+private:
+    // ハート取得数のステージ間の値引き継ぎ用変数
+    static int _heartCountOnGame;
 };
 
 #endif /* defined(__KawazJet__MainScene__) */
