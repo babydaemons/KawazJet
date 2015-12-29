@@ -50,6 +50,8 @@ public:
     CC_SYNTHESIZE(float, _second, Second);
     /// 無敵の残時間（秒）
     CC_SYNTHESIZE(float, _matchlessSecond, MatchlessSecond);
+    /// 無敵状態表示のスプライト
+    CC_SYNTHESIZE_RETAIN(cocos2d::Sprite *, _matchlessSign, MatchlessSign);
     /// アイテム表示用のスプライト一覧
     CC_SYNTHESIZE_PASS_BY_REF(cocos2d::Vector<cocos2d::Sprite *>, _items, Items);
     /// ハート表示用のスプライト一覧

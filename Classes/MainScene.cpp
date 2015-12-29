@@ -184,6 +184,11 @@ bool MainScene::initWithLevel(int level)
     label->enableShadow();
     this->setCoinLabel(label);
     
+    // 無敵状態を表示
+    _matchlessSign = Sprite::create("matchless.png");
+    _matchlessSign->setPosition(Vec2(20, winSize.height - 70));
+    this->addChild(_matchlessSign);
+    _matchlessSign->setColor((_state == State::MATCHLESS) ? Color3B::WHITE : Color3B::BLACK);
     
     // 取得したアイテムの数を表示
     for (int i = 0; i < MAX_ITEM_COUNT; ++i) {
@@ -305,6 +310,9 @@ void MainScene::update(float dt)
         _second += dt;
         this->updateSecond();
     }
+
+    // 無敵状態を表示
+    _matchlessSign->setColor((_state == State::MATCHLESS) ? Color3B::WHITE : Color3B::BLACK);
 }
 
 void MainScene::onDead()
