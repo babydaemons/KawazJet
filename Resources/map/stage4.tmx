@@ -115,12 +115,12 @@
  </tileset>
  <layer name="Terrain" width="117" height="14">
   <data encoding="base64" compression="zlib">
-   eJztmEsOwCAIBdm19uf9b1u5gKkV5IW8SVgSDSMSFSEebBOxmqfF2YkrYE+I/HUT4XSX/hkrAXtChE7zQad4zM63FW50DlrMOjr9nu+NurCoN51+z/dEe7SITb1ri6MTt8EaGfA+C1Vy9RAalu/MkTyru5f4MuJUe5X3Ij4RbxniC53mw8LpzF8zyh90NGj1ewEb9QUM
+   eJztmEsOgCAMRLtTVOT+t5VegPApdILzklkSSR+lEREyg2Mgq3lz7kIehz0h0uvGw+kp5TMWHPaECJ3uB53iMTrfVrjROWgx6+i0fv1s1IVFvekUA+3RIDb1TjlXIdHgG3+m9gwl2auH0LD8z2xZZ3X3krm0ONVe5b2ID+r8Jv3Q6X5YOB15a0Z5g/YGrX4fbsIE/g==
   </data>
  </layer>
  <layer name="Object" width="117" height="14">
   <data encoding="base64" compression="zlib">
-   eJztmEsOgCAMBQE/9z+yKzeEQgtteSKTGDWCEMYHagi6HMr3+yLRqZ3k1I4lZ+Xa5daLNq9TzTEvZQXJaSKOOeeSevnmhdRp7/OI6JTyQjlvHXP9W2OR0xJoTrn5lHrk5lwDai0YcYrkSQLli5or8/LSet60nNbeobh9vvndcWEkb5JyiOtpzPY5X83p6ozkdIONVuaQsovUF0us37dRxrH1fVGjNjf1XpPWof6HlcrPcjpjDkd5vqz5k9ONLdvpelBOH06OAOk=
+   eJztmN0KgCAMRrOf93/lroQQv83ZNmd5IDLUFI9Ta9t0OZTfNyPJqZ3dqR1LTiLvcusFT3aqOea1WInkdAfplmdJvfLyQuq0dz5GdIq8IOdcutW/NRZxWiOa09b4lHpsjXMN0F7wxmkkTxKQL7RWluWl9bzhnFJnqNmdPtM9ccuVG7mfJtBmKu4lszr9OpTTnL+YE62YixS7kfpiifV5O8o4ct8XFNTa1JsnrYP+h9XKj3I6Yg2PMr+s+ZPThS3L6fdATm8O4gDl
   </data>
  </layer>
 </map>
